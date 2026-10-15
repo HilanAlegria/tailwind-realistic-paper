@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paginación</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @layer utilities {
+      .paper-container {
+        width: 100%;
+        max-width: 850px;
+        height: 1100px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 24px 38px 3px rgb(0 0 0 / 0.14);
+        flex-shrink: 0;
+      }
+      
+      .paper-texture {
+        background-color: #fdfdfc;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      }
+
+      .paper-text-sync {
+        line-height: var(--line-height, 28px);
+        padding-top: calc(var(--offset-top, 56px) + 0.15rem);
+        height: 100%;
+        overflow: hidden;
+        outline: none;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-800 py-12 overflow-auto font-sans text-slate-700">
+
+  <div id="document-wrapper" class="flex flex-col items-center gap-12 w-full">
+    <div class="paper-container paper-texture relative mx-4 page-node">
+      <span class="absolute bottom-6 right-8 text-xs text-slate-300 select-none page-indicator">Hoja 1</span>
+      <div class="relative z-10 w-full px-16 paper-text-sync editor-node" contenteditable="true"></div>
+    </div>
+  </div>
+
+  <template id="page-template">
+    <div class="paper-container paper-texture relative mx-4 page-node">
+      <span class="absolute bottom-6 right-8 text-xs text-slate-300 select-none page-indicator"></span>
+      <div class="relative z-10 w-full px-16 paper-text-sync editor-node" contenteditable="true"></div>
+    </div>
+  </template>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const maxPages = 10;
+      const wrapper = document.getElementById('document-wrapper');
+      const template = document.getElementById('page-template');
+
+      function updatePageNumbers() {
+        const indicators = document.querySelectorAll('.page-indicator');
+        indicators.forEach((indicator, index) => {
+          indicator.textContent = `Hoja ${index + 1}`;
+        });
+      }
+
+      function handleInput(event) {
+        const editor = event.target;
+        
+        if (editor.scrollHeight > editor.clientHeight) {
+          const currentPages = document.querySelectorAll('.page-node').length;
+          
+          if (currentPages >= maxPages) {
+            editor.innerText = editor.innerText.slice(0, -1);
+            setCursorToEnd(editor);
+            return;
+          }
+
+          const newPage = template.content.cloneNode(true);
+          const newEditor = newPage.querySelector('.editor-node');
+          
+          newEditor.addEventListener('input', handleInput);
+          newEditor.addEventListener('keydown', handleKeydown);
+          wrapper.appendChild(newPage);
+          
+          updatePageNumbers();
+          
+          const appendedPage = wrapper.lastElementChild;
+          appendedPage.scrollIntoView({ behavior: 'auto', block: 'center' });
+          newEditor.focus();
+        }
+      }
+
+      function handleKeydown(event) {
+        const editor = event.target;
+        
+        if (event.key === 'Backspace') {
+          const content = editor.innerText.trim();
+          
+          if (content === '') {
+            const allPages = Array.from(document.querySelectorAll('.page-node'));
+            const currentIndex = allPages.indexOf(editor.closest('.page-node'));
+            
+            if (currentIndex > 0) {
+              event.preventDefault();
+              const previousPage = allPages[currentIndex - 1];
+              const previousEditor = previousPage.querySelector('.editor-node');
+              
+              editor.closest('.page-node').remove();
+              updatePageNumbers();
+              setCursorToEnd(previousEditor);
+              previousPage.scrollIntoView({ behavior: 'auto', block: 'center' });
+            }
+          }
+        }
+      }
+
+      function setCursorToEnd(element) {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(element);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        element.focus();
+      }
+
+      const initialEditor = document.querySelector('.editor-node');
+      initialEditor.addEventListener('input', handleInput);
+      initialEditor.addEventListener('keydown', handleKeydown);
+      updatePageNumbers();
+    });
+  </script>
+</body>
+</html>

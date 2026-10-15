@@ -1,0 +1,24 @@
+<template>
+  <div class="min-h-screen bg-slate-200 py-12 flex justify-center overflow-auto">
+    
+    <div class="paper-container bg-white relative mx-4">
+      
+      <div class="absolute inset-0 paper-lines pointer-events-none"></div>
+
+      <div class="relative z-10 w-full h-full px-16 paper-text-sync">
+        
+        <p class="text-slate-800 text-base font-sans">
+          Este es el primer párrafo de prueba. El texto se alinea de manera natural
+          sobre la línea gris trazada por el gradiente.
+        </p>
+        <p class="text-slate-800 text-base font-sans mt-[var(--line-height)]">
+          Al usar un margen (margin-top) que es múltiplo exacto de la variable 
+          --line-height, el espaciado entre párrafos no rompe la alineación
+          con los renglones inferiores. Esto soluciona los problemas de desborde.
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+</template>

@@ -1,0 +1,20 @@
+{
+  "name": "tailwind-realistic-paper",
+  "version": "1.0.0",
+  "description": "Plugin de Tailwind CSS para crear hojas de papel realistas con paginacion nativa.",
+  "main": "tailwind-realistic-paper.js",
+  "keywords": [
+    "tailwindcss",
+    "plugin",
+    "paper",
+    "notebook",
+    "tiptap",
+    "editor"
+  ],
+  "author": "Hilan Eduardo Alegria Yate",
+  "license": "MIT",
+  "peerDependencies": {
+    "tailwindcss": "^3.0.0"
+  }
+}
+
